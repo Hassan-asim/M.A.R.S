@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CollabResearch | Quantum Medicine Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "agent-researcher-a": "#0EA5E9",
+                    "secondary-fixed-dim": "#c4c7c8",
+                    "surface-container-low": "#eff4ff",
+                    "tertiary-container": "#005035",
+                    "on-error-container": "#93000a",
+                    "background": "#f8f9ff",
+                    "agent-fact-checker": "#F59E0B",
+                    "secondary-container": "#dee0e1",
+                    "on-surface": "#0b1c30",
+                    "agent-researcher-b": "#8B5CF6",
+                    "surface-border": "#E2E8F0",
+                    "surface-dim": "#cbdbf5",
+                    "agent-writer": "#EC4899",
+                    "outline-variant": "#c0c8cc",
+                    "surface": "#f8f9ff",
+                    "inverse-primary": "#9acee5",
+                    "on-primary-fixed-variant": "#104d60",
+                    "report-bg": "#FFFFFF",
+                    "primary-fixed": "#baeaff",
+                    "on-tertiary-container": "#33ca91",
+                    "secondary-fixed": "#e1e3e4",
+                    "surface-container-highest": "#d3e4fe",
+                    "error": "#ba1a1a",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-fixed": "#001f29",
+                    "on-tertiary-fixed": "#002113",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#444748",
+                    "surface-container-high": "#dce9ff",
+                    "primary": "#003342",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#e5eeff",
+                    "on-secondary-fixed": "#191c1d",
+                    "tertiary": "#003723",
+                    "tertiary-fixed": "#6ffbbe",
+                    "agent-editor": "#10B981",
+                    "error-container": "#ffdad6",
+                    "inverse-surface": "#213145",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#2f6579",
+                    "outline": "#71787c",
+                    "agent-planner": "#6366F1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "secondary": "#5c5f60",
+                    "primary-container": "#0d4b5e",
+                    "on-surface-variant": "#40484c",
+                    "primary-fixed-dim": "#9acee5",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-background": "#0b1c30",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary-container": "#86bad0",
+                    "on-secondary-container": "#606364",
+                    "surface-bright": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "log-indent": "2.5rem",
+                    "gutter": "1rem",
+                    "stack-gap": "0.75rem",
+                    "report-max-width": "700px",
+                    "margin-sm": "1rem",
+                    "margin-md": "2rem"
+            },
+            "fontFamily": {
+                    "report-h2": ["Hanken Grotesk"],
+                    "chat-bubble": ["Inter"],
+                    "report-h1-mobile": ["Hanken Grotesk"],
+                    "report-body": ["Inter"],
+                    "caption": ["Inter"],
+                    "report-h1": ["Hanken Grotesk"],
+                    "status-label": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "report-h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "chat-bubble": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "report-h1-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "report-body": ["16px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "report-h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "status-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .pulse-dot {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .3; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-chat-bubble text-on-surface antialiased">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-surface-border shadow-sm flex justify-between items-center px-gutter py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="science">science</span>
+<div class="flex flex-col">
+<h1 class="font-report-h1 text-report-h1-mobile text-primary tracking-tight leading-none">CollabResearch</h1>
+<span class="text-[10px] uppercase tracking-widest text-outline font-status-label">Precision Multi-Agent Intelligence</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low transition-colors p-2 rounded-full" data-icon="account_circle">account_circle</button>
+</div>
+</header>
+<!-- Main Chat Canvas -->
+<main class="pt-20 pb-32 px-gutter max-w-report-max-width mx-auto flex flex-col gap-6">
+<!-- User Initial Request -->
+<div class="flex flex-col items-end w-full animate-fade-in">
+<div class="bg-primary text-white p-4 rounded-xl rounded-tr-none max-w-[85%] shadow-sm">
+<p class="text-chat-bubble">Generate a comprehensive research report on the applications of Quantum Computing in modern Medicine. Focus on drug discovery and personalized treatment.</p>
+</div>
+<span class="text-caption text-outline-variant mt-1 mr-1">10:42 AM</span>
+</div>
+<!-- Agent Status Log Stack -->
+<div class="flex flex-col gap-stack-gap ml-2 border-l-2 border-surface-container pl-4">
+<!-- Agent Status Row: Planner Working -->
+<div class="flex items-center gap-3 animate-pulse">
+<div class="w-8 h-8 rounded-full bg-agent-planner/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-agent-planner text-[18px]" data-icon="architecture">architecture</span>
+</div>
+<div class="flex flex-col">
+<span class="font-status-label text-status-label text-agent-planner uppercase">Planner</span>
+<div class="flex items-center gap-2">
+<span class="text-caption text-on-surface-variant">Breaking down your topic...</span>
+<div class="w-1.5 h-1.5 rounded-full bg-agent-planner pulse-dot"></div>
+</div>
+</div>
+</div>
+<!-- Agent Status Row: Planner Handoff -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-agent-planner/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-agent-planner text-[18px]" data-icon="architecture">architecture</span>
+</div>
+<div class="flex flex-col">
+<span class="font-status-label text-status-label text-agent-planner uppercase">Planner</span>
+<div class="flex items-center gap-2">
+<span class="text-caption text-on-surface-variant">Handing off to Researcher A</span>
+<span class="material-symbols-outlined text-outline-variant text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+<span class="font-status-label text-status-label text-agent-researcher-a">Researcher A</span>
+</div>
+</div>
+</div>
+<!-- Agent Status Row: Researcher A Working -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-agent-researcher-a/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-agent-researcher-a text-[18px]" data-icon="database">database</span>
+</div>
+<div class="flex flex-col">
+<span class="font-status-label text-status-label text-agent-researcher-a uppercase">Researcher A</span>
+<div class="flex items-center gap-2">
+<span class="text-caption text-on-surface-variant">Searching web for medical applications...</span>
+<div class="w-1.5 h-1.5 rounded-full bg-agent-researcher-a pulse-dot"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Final Report Bubble (Hero Component) -->
+<article class="bg-report-bg border border-surface-border rounded-xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
+<!-- Badge Header -->
+<div class="bg-agent-editor/5 px-4 py-2 border-b border-surface-border flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-agent-editor text-[18px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-status-label text-status-label text-agent-editor">Approved by Editor Agent</span>
+</div>
+<span class="text-caption text-outline">Report #QC-882</span>
+</div>
+<!-- Markdown Content Body -->
+<div class="p-6 md:p-8">
+<h1 class="font-report-h1-mobile text-report-h1-mobile text-primary mb-4">Quantum Computing: The New Frontier in Medicine</h1>
+<p class="font-report-body text-report-body text-on-surface-variant mb-6">
+                    Quantum computing stands at the precipice of revolutionizing healthcare, transitioning from theoretical physics to practical medical applications. Unlike classical computers that process bits, quantum computers utilize qubits, enabling them to solve complex biological simulations that were previously computationally impossible.
+                </p>
+<h2 class="font-report-h2 text-report-h2 text-primary mb-3">Accelerating Drug Discovery</h2>
+<p class="font-report-body text-report-body text-on-surface-variant mb-4">
+                    The most immediate impact is observed in molecular modeling. Classical systems struggle to simulate the behavior of atoms in large molecules. Quantum systems can model these interactions with near-perfect fidelity, potentially reducing the time for new drug development from decades to months.
+                </p>
+<div class="bg-surface-container-low p-4 rounded-lg border-l-4 border-agent-researcher-a mb-6">
+<p class="text-caption italic text-on-surface-variant">"Quantum-enhanced simulation allows for the analysis of protein folding patterns with 10,000x more precision than current supercomputers." — Dr. H. Vance, Quantum Bio-Lab</p>
+</div>
+<h2 class="font-report-h2 text-report-h2 text-primary mb-3">Personalized Precision Medicine</h2>
+<p class="font-report-body text-report-body text-on-surface-variant mb-6">
+                    By processing genomic data at unprecedented speeds, quantum algorithms can identify specific genetic markers for diseases, allowing for highly tailored treatment plans that adapt to a patient's unique biological makeup.
+                </p>
+<!-- Collapsible Sources -->
+<details class="group border-t border-surface-border pt-4 mt-8">
+<summary class="list-none cursor-pointer flex items-center justify-between text-caption font-semibold text-outline hover:text-primary transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="link">link</span>
+                            VIEW RESEARCH SOURCES (3)
+                        </div>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform" data-icon="expand_more">expand_more</span>
+</summary>
+<ul class="mt-3 space-y-2 pl-6">
+<li class="text-caption text-agent-researcher-a hover:underline"><a href="#">Nature: Quantum Simulation in Molecular Biology (2024)</a></li>
+<li class="text-caption text-agent-researcher-a hover:underline"><a href="#">MIT Review: The Qubit Pharmacy (Feb 2024)</a></li>
+<li class="text-caption text-agent-researcher-a hover:underline"><a href="#">IEEE: Algorithms for Genomic Sequential Analysis</a></li>
+</ul>
+</details>
+<!-- Download Action -->
+<div class="mt-8">
+<button class="w-full py-3 px-4 bg-primary text-white font-semibold rounded-lg flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                        Download Report (.md)
+                    </button>
+</div>
+</div>
+</article>
+</main>
+<!-- Bottom Message Shell -->
+<footer class="fixed bottom-0 left-0 w-full bg-surface/80 backdrop-blur-xl px-gutter py-4 pb-8 md:pb-4 border-t border-surface-border z-50">
+<div class="max-w-report-max-width mx-auto">
+<!-- Contextual File Chip -->
+<div class="flex items-center gap-2 mb-3">
+<div class="flex items-center gap-2 bg-white border border-surface-border px-3 py-1.5 rounded-full shadow-sm group">
+<span class="material-symbols-outlined text-agent-researcher-a text-[18px]" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="text-caption font-medium truncate max-w-[120px]">reference.pdf</span>
+<button class="material-symbols-outlined text-outline-variant hover:text-error text-[16px]" data-icon="close">close</button>
+</div>
+</div>
+<!-- Input Bar -->
+<div class="relative flex items-center bg-white border border-surface-border rounded-xl shadow-md overflow-hidden focus-within:border-primary-container transition-colors">
+<button class="p-3 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+</button>
+<textarea class="w-full py-3 bg-transparent border-none focus:ring-0 text-chat-bubble resize-none max-h-32" placeholder="Ask a follow-up or provide more data..." rows="1"></textarea>
+<button class="p-3 mr-1 text-primary hover:bg-surface-container-low rounded-lg transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="send" data-weight="fill" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Bottom Mobile Nav Shell (as per Shared Components) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full h-16 bg-surface border-t border-surface-border flex justify-around items-center px-4 z-[60] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-primary font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble" data-weight="fill" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-caption text-[10px] mt-1">Research</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-caption text-[10px] mt-1">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-caption text-[10px] mt-1">Settings</span>
+</a>
+</nav>
+<script>
+        // Auto-expand textarea
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('input', () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        });
+
+        // Basic scroll to bottom on load
+        window.scrollTo(0, document.body.scrollHeight);
+    </script>
+</body></html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "outline": "#71787c",
+                "on-primary-container": "#86bad0",
+                "on-surface-variant": "#40484c",
+                "surface-container": "#e5eeff",
+                "tertiary-container": "#005035",
+                "secondary-fixed": "#e1e3e4",
+                "background": "#f8f9ff",
+                "on-secondary-container": "#606364",
+                "on-primary-fixed": "#001f29",
+                "on-error-container": "#93000a",
+                "on-tertiary-fixed": "#002113",
+                "surface-tint": "#2f6579",
+                "surface-container-low": "#eff4ff",
+                "inverse-primary": "#9acee5",
+                "surface-variant": "#d3e4fe",
+                "on-background": "#0b1c30",
+                "surface-container-highest": "#d3e4fe",
+                "surface-container-lowest": "#ffffff",
+                "surface": "#f8f9ff",
+                "on-tertiary": "#ffffff",
+                "surface-bright": "#f8f9ff",
+                "agent-researcher-a": "#0EA5E9",
+                "agent-writer": "#EC4899",
+                "inverse-on-surface": "#eaf1ff",
+                "secondary-container": "#dee0e1",
+                "on-primary": "#ffffff",
+                "report-bg": "#FFFFFF",
+                "on-secondary-fixed": "#191c1d",
+                "agent-researcher-b": "#8B5CF6",
+                "tertiary-fixed-dim": "#4edea3",
+                "secondary": "#5c5f60",
+                "tertiary-fixed": "#6ffbbe",
+                "inverse-surface": "#213145",
+                "agent-editor": "#10B981",
+                "agent-fact-checker": "#F59E0B",
+                "secondary-fixed-dim": "#c4c7c8",
+                "on-primary-fixed-variant": "#104d60",
+                "surface-container-high": "#dce9ff",
+                "tertiary": "#003723",
+                "primary": "#003342",
+                "on-error": "#ffffff",
+                "primary-fixed-dim": "#9acee5",
+                "surface-dim": "#cbdbf5",
+                "on-tertiary-fixed-variant": "#005236",
+                "surface-border": "#E2E8F0",
+                "on-tertiary-container": "#33ca91",
+                "primary-fixed": "#baeaff",
+                "on-secondary-fixed-variant": "#444748",
+                "on-secondary": "#ffffff",
+                "outline-variant": "#c0c8cc",
+                "agent-planner": "#6366F1",
+                "on-surface": "#0b1c30",
+                "error-container": "#ffdad6",
+                "primary-container": "#0d4b5e",
+                "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "gutter": "1rem",
+                "report-max-width": "700px",
+                "margin-md": "2rem",
+                "margin-sm": "1rem",
+                "log-indent": "2.5rem",
+                "stack-gap": "0.75rem"
+            },
+            "fontFamily": {
+                "chat-bubble": ["Inter"],
+                "status-label": ["JetBrains Mono"],
+                "report-h1": ["Hanken Grotesk"],
+                "report-h2": ["Hanken Grotesk"],
+                "report-h1-mobile": ["Hanken Grotesk"],
+                "caption": ["Inter"],
+                "report-body": ["Inter"]
+            },
+            "fontSize": {
+                "chat-bubble": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                "status-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                "report-h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "report-h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "report-h1-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                "report-body": ["16px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f8f9ff;
+            color: #0b1c30;
+            -webkit-font-smoothing: antialiased;
+        }
+        .settings-card {
+            background: #ffffff;
+            border: 1px solid #E2E8F0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .settings-card:active {
+            transform: scale(0.99);
+        }
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #dee0e1;
+            border-radius: 99px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .toggle-active {
+            background: #003342 !important;
+        }
+        .toggle-active::after {
+            transform: translateX(20px);
+        }
+        @media (max-width: 768px) {
+            .canvas-padding {
+                padding-bottom: 80px;
+            }
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="font-report-body text-report-body">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-bright/10 backdrop-blur-md border-b border-surface-border dark:border-outline-variant shadow-sm flex justify-between items-center px-gutter py-3">
+<div class="flex items-center gap-3">
+<img alt="M.A.R.S Logo" class="h-8 w-auto" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<h1 class="font-report-h1 text-report-h1-mobile md:text-report-h1 text-primary dark:text-primary-fixed tracking-tight">M.A.R.S</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<main class="pt-24 px-gutter flex justify-center canvas-padding">
+<div class="w-full max-w-[700px] flex flex-col gap-10">
+<!-- Header Section -->
+<section class="flex flex-col gap-2">
+<h2 class="font-report-h1 text-report-h1-mobile md:text-report-h1 text-primary">Settings</h2>
+<p class="text-on-surface-variant font-caption text-caption">Manage your academic profile and workspace preferences.</p>
+</section>
+<!-- Account Section -->
+<section class="flex flex-col gap-4">
+<h3 class="font-status-label text-status-label uppercase tracking-widest text-outline">Account</h3>
+<div class="flex flex-col gap-3">
+<!-- Email -->
+<div class="settings-card rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div>
+<p class="font-report-body text-[14px] font-semibold text-on-surface">Email Address</p>
+<p class="font-caption text-caption text-on-surface-variant">researcher@university.edu</p>
+</div>
+</div>
+<button class="text-primary font-caption text-caption font-semibold hover:underline">Change</button>
+</div>
+<!-- Subscription -->
+<div class="settings-card rounded-xl p-4 flex items-center justify-between border-l-4 border-l-agent-researcher-a">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-agent-researcher-a">
+<span class="material-symbols-outlined" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div>
+<p class="font-report-body text-[14px] font-semibold text-on-surface">Subscription Plan</p>
+<p class="font-caption text-caption text-on-surface-variant">Institutional Pro (Academic Tier)</p>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded-full font-caption text-caption font-medium hover:opacity-90 transition-opacity">Manage</button>
+</div>
+</div>
+</section>
+<!-- Preferences Section -->
+<section class="flex flex-col gap-4">
+<h3 class="font-status-label text-status-label uppercase tracking-widest text-outline">Preferences</h3>
+<div class="flex flex-col gap-3">
+<!-- Dark Mode -->
+<div class="settings-card rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</div>
+<div>
+<p class="font-report-body text-[14px] font-semibold text-on-surface">Dark Mode</p>
+<p class="font-caption text-caption text-on-surface-variant">Switch to a darker interface theme</p>
+</div>
+</div>
+<div class="toggle-switch" id="darkModeToggle"></div>
+</div>
+<!-- Notifications -->
+<div class="settings-card rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</div>
+<div>
+<p class="font-report-body text-[14px] font-semibold text-on-surface">Agent Notifications</p>
+<p class="font-caption text-caption text-on-surface-variant">Alert me when long-form reports are ready</p>
+</div>
+</div>
+<div class="toggle-switch toggle-active" id="notifToggle"></div>
+</div>
+</div>
+</section>
+<!-- About Section -->
+<section class="flex flex-col gap-4">
+<h3 class="font-status-label text-status-label uppercase tracking-widest text-outline">About</h3>
+<div class="flex flex-col gap-3">
+<a class="settings-card rounded-xl p-4 flex items-center justify-between group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+</div>
+<p class="font-report-body text-[14px] font-semibold text-on-surface">Terms of Service</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</a>
+<a class="settings-card rounded-xl p-4 flex items-center justify-between group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="privacy_tip">privacy_tip</span>
+</div>
+<p class="font-report-body text-[14px] font-semibold text-on-surface">Privacy Policy</p>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+</section>
+<!-- Sign Out -->
+<section class="pb-12">
+<button class="w-full border border-error text-error py-3 rounded-xl font-report-body font-semibold hover:bg-error-container/20 transition-colors">
+                Sign Out
+            </button>
+<p class="text-center mt-6 font-caption text-caption text-outline">M.A.R.S v2.4.1 (Academic Release)</p>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-16 flex justify-around items-center px-4 bg-surface dark:bg-inverse-surface border-t border-surface-border dark:border-outline-variant shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-50 md:hidden">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container dark:hover:text-primary-fixed transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-caption text-caption">Research</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container dark:hover:text-primary-fixed transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-caption text-caption">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-caption text-caption">Settings</span>
+</a>
+</nav>
+<!-- Desktop Sidebar Suggestion -->
+<div class="hidden md:flex fixed left-0 top-0 h-full w-20 flex-col items-center py-20 bg-surface-container-lowest border-r border-surface-border z-40">
+<div class="flex flex-col gap-8">
+<a class="text-secondary hover:text-primary transition-colors p-3 rounded-xl hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined text-[28px]" data-icon="chat_bubble">chat_bubble</span>
+</a>
+<a class="text-secondary hover:text-primary transition-colors p-3 rounded-xl hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined text-[28px]" data-icon="history_edu">history_edu</span>
+</a>
+<a class="text-primary p-3 rounded-xl bg-surface-container border border-surface-border" href="#">
+<span class="material-symbols-outlined text-[28px]" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+</a>
+</div>
+</div>
+<script>
+    document.getElementById('darkModeToggle').addEventListener('click', function() {
+        this.classList.toggle('toggle-active');
+        document.documentElement.classList.toggle('dark');
+    });
+
+    document.getElementById('notifToggle').addEventListener('click', function() {
+        this.classList.toggle('toggle-active');
+    });
+
+    // Add subtle active state scale to all settings-card items
+    document.querySelectorAll('.settings-card').forEach(card => {
+        card.addEventListener('mousedown', () => card.style.transform = 'scale(0.985)');
+        card.addEventListener('mouseup', () => card.style.transform = 'scale(1)');
+        card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
+    });
+</script>
+</body></html>

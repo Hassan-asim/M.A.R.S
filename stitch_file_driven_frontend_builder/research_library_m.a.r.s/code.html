@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Library | M.A.R.S</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#71787c",
+                    "on-primary-container": "#86bad0",
+                    "on-surface-variant": "#40484c",
+                    "surface-container": "#e5eeff",
+                    "tertiary-container": "#005035",
+                    "secondary-fixed": "#e1e3e4",
+                    "background": "#f8f9ff",
+                    "on-secondary-container": "#606364",
+                    "on-primary-fixed": "#001f29",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-tint": "#2f6579",
+                    "surface-container-low": "#eff4ff",
+                    "inverse-primary": "#9acee5",
+                    "surface-variant": "#d3e4fe",
+                    "on-background": "#0b1c30",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "agent-researcher-a": "#0EA5E9",
+                    "agent-writer": "#EC4899",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary-container": "#dee0e1",
+                    "on-primary": "#ffffff",
+                    "report-bg": "#FFFFFF",
+                    "on-secondary-fixed": "#191c1d",
+                    "agent-researcher-b": "#8B5CF6",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "secondary": "#5c5f60",
+                    "tertiary-fixed": "#6ffbbe",
+                    "inverse-surface": "#213145",
+                    "agent-editor": "#10B981",
+                    "agent-fact-checker": "#F59E0B",
+                    "secondary-fixed-dim": "#c4c7c8",
+                    "on-primary-fixed-variant": "#104d60",
+                    "surface-container-high": "#dce9ff",
+                    "tertiary": "#003723",
+                    "primary": "#003342",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#9acee5",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "surface-border": "#E2E8F0",
+                    "on-tertiary-container": "#33ca91",
+                    "primary-fixed": "#baeaff",
+                    "on-secondary-fixed-variant": "#444748",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c0c8cc",
+                    "agent-planner": "#6366F1",
+                    "on-surface": "#0b1c30",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#0d4b5e",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "1rem",
+                    "report-max-width": "700px",
+                    "margin-md": "2rem",
+                    "margin-sm": "1rem",
+                    "log-indent": "2.5rem",
+                    "stack-gap": "0.75rem"
+            },
+            "fontFamily": {
+                    "chat-bubble": ["Inter"],
+                    "status-label": ["JetBrains Mono"],
+                    "report-h1": ["Hanken Grotesk"],
+                    "report-h2": ["Hanken Grotesk"],
+                    "report-h1-mobile": ["Hanken Grotesk"],
+                    "caption": ["Inter"],
+                    "report-body": ["Inter"]
+            },
+            "fontSize": {
+                    "chat-bubble": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "status-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "report-h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "report-h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "report-h1-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "report-body": ["16px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .report-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-glow {
+            box-shadow: 0 0 20px rgba(0, 51, 66, 0.05);
+        }
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-report-body selection:bg-surface-variant">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-surface-border shadow-sm flex justify-between items-center px-gutter py-3">
+<div class="flex items-center gap-3">
+<img alt="M.A.R.S Logo" class="h-8 w-8 object-contain" src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+<h1 class="font-report-h1 text-report-h1-mobile md:text-report-h1 text-primary tracking-tight">M.A.R.S</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-gutter max-w-6xl mx-auto min-h-screen">
+<!-- Header Section -->
+<section class="mb-10">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="font-status-label text-status-label text-primary uppercase tracking-widest mb-2 block">Repository</span>
+<h2 class="font-report-h1 text-report-h1-mobile md:text-report-h1 text-on-background">Research Library</h2>
+<p class="text-on-surface-variant mt-2 max-w-xl">Access your historically generated high-fidelity reports and collaborative analysis logs.</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg font-caption text-caption hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-caption text-caption hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                        New Research
+                    </button>
+</div>
+</div>
+</section>
+<!-- Reports Bento/Grid Layout -->
+<div class="report-card-grid">
+<!-- Report Card 1 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-xl p-6 hover:border-primary/20 hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-agent-researcher-a" data-icon="medical_services">medical_services</span>
+</div>
+<span class="font-status-label text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded uppercase">Verified</span>
+</div>
+<h3 class="font-report-h2 text-[18px] text-on-background mb-2 leading-snug group-hover:text-primary transition-colors">Quantum Computing in Medicine: Diagnostic Breakthroughs</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-caption text-[13px] mb-6">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_today">calendar_today</span>
+                    Oct 24, 2023
+                    <span class="mx-1">•</span>
+<span>12 Agents</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full bg-agent-researcher-a border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">R</div>
+<div class="w-7 h-7 rounded-full bg-agent-planner border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">P</div>
+<div class="w-7 h-7 rounded-full bg-agent-editor border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">E</div>
+</div>
+<button class="flex items-center gap-1 font-status-label text-primary hover:underline">
+                        View Report
+                        <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Report Card 2 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-xl p-6 hover:border-primary/20 hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-agent-researcher-b" data-icon="tsunami">tsunami</span>
+</div>
+<span class="font-status-label text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded uppercase">Finalized</span>
+</div>
+<h3 class="font-report-h2 text-[18px] text-on-background mb-2 leading-snug group-hover:text-primary transition-colors">Climate Change Impact on Coastal Cities: Infrastructure Risk</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-caption text-[13px] mb-6">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_today">calendar_today</span>
+                    Oct 12, 2023
+                    <span class="mx-1">•</span>
+<span>8 Agents</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full bg-agent-researcher-b border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">R</div>
+<div class="w-7 h-7 rounded-full bg-agent-writer border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">W</div>
+</div>
+<button class="flex items-center gap-1 font-status-label text-primary hover:underline">
+                        View Report
+                        <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Report Card 3 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-xl p-6 hover:border-primary/20 hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-agent-planner" data-icon="psychology">psychology</span>
+</div>
+<span class="font-status-label text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded uppercase">Verified</span>
+</div>
+<h3 class="font-report-h2 text-[18px] text-on-background mb-2 leading-snug group-hover:text-primary transition-colors">Ethical Implications of AGI in Private Sector Surveillance</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-caption text-[13px] mb-6">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_today">calendar_today</span>
+                    Sep 28, 2023
+                    <span class="mx-1">•</span>
+<span>15 Agents</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full bg-agent-researcher-a border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">R</div>
+<div class="w-7 h-7 rounded-full bg-agent-fact-checker border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">F</div>
+<div class="w-7 h-7 rounded-full bg-agent-editor border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">E</div>
+</div>
+<button class="flex items-center gap-1 font-status-label text-primary hover:underline">
+                        View Report
+                        <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Report Card 4 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-xl p-6 hover:border-primary/20 hover:shadow-md transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-agent-fact-checker" data-icon="database">database</span>
+</div>
+<span class="font-status-label text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded uppercase">Archived</span>
+</div>
+<h3 class="font-report-h2 text-[18px] text-on-background mb-2 leading-snug group-hover:text-primary transition-colors">Decentralized Finance: Scalability Bottlenecks in L2</h3>
+<div class="flex items-center gap-2 text-on-surface-variant font-caption text-[13px] mb-6">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_today">calendar_today</span>
+                    Sep 15, 2023
+                    <span class="mx-1">•</span>
+<span>6 Agents</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full bg-agent-researcher-b border-2 border-surface-container-lowest flex items-center justify-center text-[10px] text-white">R</div>
+</div>
+<button class="flex items-center gap-1 font-status-label text-primary hover:underline">
+                        View Report
+                        <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Featured / Large Item (Asymmetric Design) -->
+<div class="mt-12 bg-primary text-on-primary rounded-2xl overflow-hidden shadow-xl flex flex-col md:flex-row relative">
+<div class="p-8 md:p-12 flex-1 z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-status-label uppercase tracking-widest text-xs opacity-80">Research of the month</span>
+</div>
+<h2 class="font-report-h1 text-report-h1-mobile md:text-report-h1 mb-4">Neuroplasticity and Long-term Memory in Synthetic Neural Nets</h2>
+<p class="text-on-primary/80 max-w-lg mb-8 font-report-body">A comprehensive 45-page analysis exploring the parallels between biological cognitive structures and emerging transformer architectures. Approved by 4 senior editors.</p>
+<button class="px-8 py-3 bg-white text-primary font-bold rounded-lg hover:bg-surface-container-low transition-colors inline-flex items-center gap-2">
+                    Open Analysis
+                    <span class="material-symbols-outlined" data-icon="launch">launch</span>
+</button>
+</div>
+<div class="w-full md:w-1/3 relative min-h-[200px]">
+<div class="absolute inset-0 bg-gradient-to-l from-primary/50 to-transparent z-10"></div>
+<div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgzzvHPnaCd5UQxfG11ZuGHNxgXH-c1coY21n8DhBHYC2UkM4IqOISBdS37TDLprK-Sqbv1aeGSlEMwfzifWoa7yiSYaDGQQ7w8NBXllOdGhcEt1I2wyDm9LD-R5gL-JAzN9NWt__8JCfamTCH1hriWSFnWpx1sOqYfxmcpIdub7-7iAflr2E4WLEBTzJxgtASXpcPnf6HmnV9igqcTQSxTTPC4_ecN1BxKrS2yAszx2fwtfj1zxNeI0-uJG4Ro0SV0PBcD30L2Qs')"></div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 left-0 w-full h-16 flex justify-around items-center px-4 bg-surface border-t border-surface-border shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-50">
+<!-- Destination: Research -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-caption text-caption">Research</span>
+</a>
+<!-- Destination: Library (ACTIVE) -->
+<a class="flex flex-col items-center justify-center text-primary font-bold transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu" style="font-variation-settings: 'FILL' 1;">history_edu</span>
+<span class="font-caption text-caption">Library</span>
+<div class="w-1.5 h-1.5 bg-primary rounded-full mt-0.5"></div>
+</a>
+<!-- Destination: Settings -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-primary-container transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-caption text-caption">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('.report-card-grid > div').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.add('scale-95', 'opacity-80');
+                setTimeout(() => card.classList.remove('scale-95', 'opacity-80'), 150);
+            });
+        });
+
+        // Atmospheric Scroll Effect for Header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+                header.style.backgroundColor = 'rgba(248, 249, 255, 0.95)';
+            } else {
+                header.classList.remove('shadow-md');
+                header.style.backgroundColor = 'rgba(248, 249, 255, 0.8)';
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Sign Up | CollabResearch</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#d3e4fe",
+                    "on-primary-container": "#86bad0",
+                    "error": "#ba1a1a",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#0b1c30",
+                    "on-error": "#ffffff",
+                    "agent-writer": "#EC4899",
+                    "surface-dim": "#cbdbf5",
+                    "on-secondary-fixed": "#191c1d",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "primary-fixed-dim": "#9acee5",
+                    "inverse-primary": "#9acee5",
+                    "surface": "#f8f9ff",
+                    "primary-container": "#0d4b5e",
+                    "on-primary-fixed": "#001f29",
+                    "surface-container-low": "#eff4ff",
+                    "agent-fact-checker": "#F59E0B",
+                    "secondary": "#5c5f60",
+                    "secondary-fixed-dim": "#c4c7c8",
+                    "agent-editor": "#10B981",
+                    "primary-fixed": "#baeaff",
+                    "primary": "#003342",
+                    "on-surface": "#0b1c30",
+                    "on-secondary-fixed-variant": "#444748",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-fixed": "#e1e3e4",
+                    "background": "#f8f9ff",
+                    "secondary-container": "#dee0e1",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#e5eeff",
+                    "report-bg": "#FFFFFF",
+                    "surface-tint": "#2f6579",
+                    "on-secondary-container": "#606364",
+                    "on-surface-variant": "#40484c",
+                    "inverse-surface": "#213145",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "on-primary-fixed-variant": "#104d60",
+                    "tertiary-container": "#005035",
+                    "outline-variant": "#c0c8cc",
+                    "surface-border": "#E2E8F0",
+                    "agent-researcher-a": "#0EA5E9",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#6ffbbe",
+                    "outline": "#71787c",
+                    "agent-planner": "#6366F1",
+                    "agent-researcher-b": "#8B5CF6",
+                    "on-tertiary-container": "#33ca91",
+                    "tertiary": "#003723",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-bright": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "log-indent": "2.5rem",
+                    "gutter": "1rem",
+                    "report-max-width": "700px",
+                    "margin-sm": "1rem",
+                    "margin-md": "2rem",
+                    "stack-gap": "0.75rem"
+            },
+            "fontFamily": {
+                    "report-h1": ["Hanken Grotesk"],
+                    "report-body": ["Inter"],
+                    "chat-bubble": ["Inter"],
+                    "report-h2": ["Hanken Grotesk"],
+                    "report-h1-mobile": ["Hanken Grotesk"],
+                    "caption": ["Inter"],
+                    "status-label": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "report-h1": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "report-body": ["16px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "chat-bubble": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "report-h2": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "report-h1-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "status-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFB;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .form-input-focus:focus {
+            border-color: #2f6579;
+            box-shadow: 0 0 0 1px #2f6579;
+            outline: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="font-report-body text-on-background min-h-screen flex flex-col items-center">
+<!-- Top Navigation Shell (Filtered for Transactional Page but Brand Anchor preserved) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md px-gutter py-4 flex justify-center items-center shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="science">science</span>
+<span class="font-report-h1 text-report-h1-mobile text-primary tracking-tight">CollabResearch</span>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[400px] mt-24 mb-12 px-gutter flex flex-col justify-center">
+<!-- Hero Section -->
+<div class="mb-8 text-center">
+<h1 class="font-report-h1 text-report-h1-mobile text-on-background mb-2">Sign up for CollabResearch</h1>
+<p class="font-caption text-caption text-on-surface-variant">Access academic-grade AI agents for deep analysis and reporting.</p>
+</div>
+<!-- Form Container -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-xl p-6 shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+
+
+<!-- Social Signup (Extra refinement for academic use case) -->
+<div class="mt-6">
+<button class="w-full py-3 bg-surface-container-low border border-surface-border rounded-lg text-report-body flex items-center justify-center gap-3 hover:bg-surface-container-high transition-colors">
+<img alt="Google Logo" class="w-5 h-5" data-alt="The official Google logo, a multicolored uppercase G using simple and clean geometric lines on a white background, representing modern technology and accessibility." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXtC8U8SlTm-rILasLL9TQ1daRhd_xukbZuF81GsXhKnN8wUq_qiw2G64qszByR6bAuTEQlQoD1Da2_mXEaypa9DBl6cvYiT0smGLNEisvcNwLYzP1ouhytwqDQgztNUhFmU3FTsTKax5oFC004w7v3sph-Gu2I-rIW7TyXsgkW74BXLBeKNVUUTuOBSZHVr8hvxdmWVpGFjAkPq5Ar3qzIXxhZPaNjIPyC7PlK7hUkMtl_gv2HGlJEnkdF5tH7KRaJHLgigAiVbw">
+<span class="">Sign up with University Google</span>
+</button>
+</div>
+</div>
+<!-- Footer Link -->
+
+<!-- System Log Aesthetic (Atmospheric Effect) -->
+
+</main>
+<!-- Footer Space -->
+
+<script>
+        // Micro-interaction for the password toggle
+        const toggleBtn = document.querySelector('button[type="button"]');
+        const passwordInput = document.getElementById('password');
+        const iconSpan = toggleBtn.querySelector('.material-symbols-outlined');
+
+        toggleBtn.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                iconSpan.textContent = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                iconSpan.textContent = 'visibility';
+            }
+        });
+
+        // Subtle background mouse effect
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            document.body.style.backgroundImage = `radial-gradient(circle at ${x * 100}% ${y * 100}%, rgba(203, 219, 245, 0.1) 0%, rgba(248, 250, 251, 0) 50%)`;
+        });
+    </script>
+
+
+</body></html>
