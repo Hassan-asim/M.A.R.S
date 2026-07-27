@@ -170,9 +170,9 @@ export default function Home() {
     <div className="min-h-screen bg-background font-chat-bubble text-on-surface">
       <ChatHeader />
 
-      <main className="pt-20 pb-40 md:pb-36 px-4 md:px-8 max-w-report-max-width mx-auto w-full flex flex-col gap-6">
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-40 pt-24 md:px-8 md:pb-36">
         {chatItems.length === 0 ? (
-          <section className="mt-4 overflow-hidden rounded-[28px] border border-surface-border bg-white/95 p-5 shadow-sm sm:p-7">
+          <section className="overflow-hidden rounded-[28px] border border-surface-border bg-white/95 p-5 shadow-sm sm:p-7">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="max-w-2xl">
                 <div className="mb-3 inline-flex items-center rounded-full border border-surface-border bg-surface-container-low px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
@@ -221,7 +221,7 @@ export default function Home() {
             {chatItems.map((item) => {
               if (item.type === 'user') {
                 return (
-                  <div key={item.id} className="flex flex-col items-end w-full animate-fade-in">
+                  <div key={item.id} className="flex w-full flex-col items-end animate-fade-in">
                     <div className="max-w-[88%] rounded-2xl rounded-tr-none border border-surface-border bg-primary px-4 py-3 text-white shadow-sm">
                       <p className="text-sm leading-6">{item.userTopic}</p>
                       {item.fileName && (
