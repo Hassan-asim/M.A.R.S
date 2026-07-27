@@ -3,54 +3,96 @@ export interface Message {
   content: string;
 }
 
-function getApiKeyPool(): string[] {
-  const keys: string[] = [];
+interface ProviderConfig {
+  provider: 'deepseek' | 'glm' | 'groq' | 'gemini';
+  endpoint: string;
+  model: string;
+  apiKey: string;
+}
+
+function getProviderPool(): ProviderConfig[] {
+  const providers: ProviderConfig[] = [];
+
   const deepseek1 = process.env.DEEPSEEK_API_KEY_1;
   const deepseek2 = process.env.DEEPSEEK_API_KEY_2;
   const glmKey = process.env.GLM_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
 
-  if (deepseek1) keys.push(deepseek1);
-  if (deepseek2) keys.push(deepseek2);
-  if (glmKey) keys.push(glmKey);
+  if (deepseek1) {
+    providers.push({ provider: 'deepseek', endpoint: 'https://api.deepseek.com/chat/completions', model: 'deepseek-chat', apiKey: deepseek1 });
+  }
 
-  return keys;
+  if (deepseek2) {
+    providers.push({ provider: 'deepseek', endpoint: 'https://api.deepseek.com/chat/completions', model: 'deepseek-chat', apiKey: deepseek2 });
+  }
+
+  if (glmKey) {
+    providers.push({ provider: 'glm', endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions', model: 'glm-4-flash', apiKey: glmKey });
+  }
+
+  if (groqKey) {
+    providers.push({ provider: 'groq', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.1-8b-instant', apiKey: groqKey });
+  }
+
+  if (geminiKey) {
+    providers.push({ provider: 'gemini', endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, model: 'gemini-2.0-flash', apiKey: geminiKey });
+  }
+
+  return providers;
 }
 
 async function tryProviderCall(
-  endpoint: string,
-  model: string,
-  apiKey: string,
+  providerConfig: ProviderConfig,
   messages: Message[],
-  temperature: number,
-  provider: 'deepseek' | 'glm'
+  temperature: number
 ): Promise<string | null> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
 
-  if (provider === 'deepseek') {
-    headers.Authorization = `Bearer ${apiKey}`;
-  } else {
-    headers.Authorization = `Bearer ${apiKey}`;
-  }
+  let body: string;
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      model,
+  if (providerConfig.provider === 'gemini') {
+    const prompt = messages.map((message) => `${message.role.toUpperCase()}: ${message.content}`).join('\n\n');
+    body = JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature },
+    });
+  } else {
+    headers.Authorization = `Bearer ${providerConfig.apiKey}`;
+    body = JSON.stringify({
+      model: providerConfig.model,
       messages,
       temperature,
-    }),
+      max_completion_tokens: 1024,
+      top_p: 1,
+    });
+  }
+
+  const response = await fetch(providerConfig.endpoint, {
+    method: 'POST',
+    headers,
+    body,
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.warn(`${provider} request failed (${response.status}): ${errorText}`);
+    console.warn(`${providerConfig.provider} request failed (${response.status}): ${errorText}`);
     return null;
   }
 
   const data = await response.json();
+
+  if (providerConfig.provider === 'gemini') {
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (typeof text === 'string' && text.trim()) {
+      return text.trim();
+    }
+
+    return null;
+  }
+
   const content = data.choices?.[0]?.message?.content;
   if (typeof content === 'string' && content.trim()) {
     return content.trim();
@@ -60,54 +102,39 @@ async function tryProviderCall(
 }
 
 /**
- * Calls the configured provider pool using DeepSeek and GLM APIs.
+ * Calls the configured provider pool using DeepSeek, GLM, Groq, and Gemini APIs.
  */
 export async function callOpenRouter(
   messages: Message[],
   preferredKeyIndex?: number,
   temperature = 0.7
 ): Promise<string> {
-  const apiKeys = getApiKeyPool();
+  const providerPool = getProviderPool();
 
-  if (apiKeys.length === 0) {
+  if (providerPool.length === 0) {
     throw new Error('No provider API keys were configured.');
   }
 
-  const orderedKeys = [...apiKeys];
-  if (preferredKeyIndex && preferredKeyIndex >= 1 && preferredKeyIndex <= 4) {
-    const preferred = apiKeys[preferredKeyIndex - 1];
+  const orderedProviders = [...providerPool];
+  if (preferredKeyIndex && preferredKeyIndex >= 1 && preferredKeyIndex <= orderedProviders.length) {
+    const preferred = orderedProviders[preferredKeyIndex - 1];
     if (preferred) {
-      orderedKeys.splice(orderedKeys.indexOf(preferred), 1);
-      orderedKeys.unshift(preferred);
+      orderedProviders.splice(orderedProviders.indexOf(preferred), 1);
+      orderedProviders.unshift(preferred);
     }
   }
 
-  const providers = [
-    { provider: 'deepseek' as const, endpoint: 'https://api.deepseek.com/chat/completions', model: 'deepseek-chat' },
-    { provider: 'glm' as const, endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions', model: 'glm-4-flash' },
-  ];
-
   let lastError: unknown = null;
 
-  for (const providerConfig of providers) {
-    for (const apiKey of orderedKeys) {
-      try {
-        const result = await tryProviderCall(
-          providerConfig.endpoint,
-          providerConfig.model,
-          apiKey,
-          messages,
-          temperature,
-          providerConfig.provider
-        );
-
-        if (result) {
-          return result;
-        }
-      } catch (err) {
-        lastError = err;
-        console.warn(`${providerConfig.provider} fetch error:`, err);
+  for (const providerConfig of orderedProviders) {
+    try {
+      const result = await tryProviderCall(providerConfig, messages, temperature);
+      if (result) {
+        return result;
       }
+    } catch (err) {
+      lastError = err;
+      console.warn(`${providerConfig.provider} fetch error:`, err);
     }
   }
 

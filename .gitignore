@@ -35,3 +35,4 @@ yarn-error.log*
 /stitch_file_driven_frontend_builder/
 .ideavo/project
 *.log
+/client_secret_117299588539-eql6lvpv62mdivg4ded0t6l73a4ktjta.apps.googleusercontent.com.json
