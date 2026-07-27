@@ -24,18 +24,43 @@ interface ChatItem {
   sources?: string[];
 }
 
+interface ResearchSession {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  items: ChatItem[];
+}
+
+interface UserPreferences {
+  outputFormat: 'markdown' | 'executive' | 'bullet';
+  researchDepth: 'fast' | 'balanced' | 'deep';
+  tone: 'concise' | 'formal' | 'analytical';
+  autoSave: boolean;
+}
+
 const QUICK_PROMPTS = [
   'Summarize the latest breakthroughs in quantum computing for medicine.',
   'Compare the current state of AI-assisted drug discovery and clinical trials.',
   'Expand this research note with recent academic findings and practical implications.',
 ];
 
+const DEFAULT_PREFERENCES: UserPreferences = {
+  outputFormat: 'markdown',
+  researchDepth: 'balanced',
+  tone: 'formal',
+  autoSave: true,
+};
+
 export default function Home() {
   const [chatItems, setChatItems] = useState<ChatItem[]>([]);
+  const [sessions, setSessions] = useState<ResearchSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeView, setActiveView] = useState<'research' | 'library' | 'settings'>('research');
   const [isHydrated, setIsHydrated] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -46,17 +71,119 @@ export default function Home() {
     scrollToBottom();
   }, [chatItems]);
 
+  const createSessionId = () => `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  const buildSessionTitle = (items: ChatItem[]) => {
+    const topic = items.find((item) => item.type === 'user')?.userTopic?.trim();
+    if (topic) {
+      return topic.length > 48 ? `${topic.slice(0, 45)}…` : topic;
+    }
+    return 'New research brief';
+  };
+
+  const upsertSession = (sessionId: string, items: ChatItem[], title?: string) => {
+    const now = new Date().toISOString();
+    setSessions((prev) => {
+      const existing = prev.find((session) => session.id === sessionId);
+      if (existing) {
+        return prev.map((session) =>
+          session.id === sessionId
+            ? {
+                ...session,
+                items,
+                title: title ?? buildSessionTitle(items),
+                updatedAt: now,
+              }
+            : session
+        );
+      }
+
+      const nextSession: ResearchSession = {
+        id: sessionId,
+        title: title ?? buildSessionTitle(items),
+        createdAt: now,
+        updatedAt: now,
+        items,
+      };
+
+      return [nextSession, ...prev];
+    });
+  };
+
+  const ensureSession = (items: ChatItem[], title?: string) => {
+    const targetId = activeSessionId ?? createSessionId();
+    if (!activeSessionId) {
+      setActiveSessionId(targetId);
+    }
+    upsertSession(targetId, items, title);
+    return targetId;
+  };
+
+  const startNewChat = () => {
+    const nextSessionId = createSessionId();
+    setActiveSessionId(nextSessionId);
+    setChatItems([]);
+    setSessions((prev) => {
+      const freshSession: ResearchSession = {
+        id: nextSessionId,
+        title: 'New research brief',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        items: [],
+      };
+      return [freshSession, ...prev];
+    });
+    setActiveView('research');
+  };
+
+  const openSession = (sessionId: string) => {
+    const selected = sessions.find((session) => session.id === sessionId);
+    if (!selected) return;
+
+    setActiveSessionId(sessionId);
+    setChatItems(selected.items);
+    setActiveView('research');
+  };
+
   useEffect(() => {
     const syncAuth = () => {
       setUser(readAuthSession());
     };
 
     try {
-      const savedItems = window.localStorage.getItem('mars-chat-items');
-      if (savedItems) {
-        const parsedItems = JSON.parse(savedItems) as ChatItem[];
-        if (Array.isArray(parsedItems)) {
-          setChatItems(parsedItems);
+      const savedSessions = window.localStorage.getItem('mars-research-sessions');
+      if (savedSessions) {
+        const parsedSessions = JSON.parse(savedSessions) as ResearchSession[];
+        if (Array.isArray(parsedSessions) && parsedSessions.length > 0) {
+          setSessions(parsedSessions);
+          setActiveSessionId(parsedSessions[0].id);
+          setChatItems(parsedSessions[0].items);
+        }
+      } else {
+        const savedItems = window.localStorage.getItem('mars-chat-items');
+        if (savedItems) {
+          const parsedItems = JSON.parse(savedItems) as ChatItem[];
+          if (Array.isArray(parsedItems) && parsedItems.length > 0) {
+            const restoredSessionId = createSessionId();
+            const restoredSession: ResearchSession = {
+              id: restoredSessionId,
+              title: buildSessionTitle(parsedItems),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              items: parsedItems,
+            };
+            setSessions([restoredSession]);
+            setActiveSessionId(restoredSessionId);
+            setChatItems(parsedItems);
+          }
+        }
+      }
+
+      const savedPreferences = window.localStorage.getItem('mars-user-preferences');
+      if (savedPreferences) {
+        const parsedPreferences = JSON.parse(savedPreferences) as UserPreferences;
+        if (parsedPreferences) {
+          setPreferences(parsedPreferences);
         }
       }
 
@@ -76,6 +203,16 @@ export default function Home() {
     if (!isHydrated) return;
     window.localStorage.setItem('mars-chat-items', JSON.stringify(chatItems));
   }, [chatItems, isHydrated]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    window.localStorage.setItem('mars-research-sessions', JSON.stringify(sessions));
+  }, [sessions, isHydrated]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    window.localStorage.setItem('mars-user-preferences', JSON.stringify(preferences));
+  }, [preferences, isHydrated]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -101,7 +238,9 @@ export default function Home() {
       timestamp,
     };
 
-    setChatItems((prev) => [...prev, userMessage]);
+    const nextItems = [...chatItems, userMessage];
+    setChatItems(nextItems);
+    ensureSession(nextItems, buildSessionTitle(nextItems));
 
     const formData = new FormData();
     if (topic) formData.append('topic', topic);
@@ -154,16 +293,20 @@ export default function Home() {
       }
     } catch (error: any) {
       console.error('Error communicating with /api/research:', error);
-      setChatItems((prev) => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          type: 'agent_status',
-          statusType: 'agent_done',
-          agent: 'fact_checker',
-          label: `Error: ${error.message || 'Failed to complete research request.'}`,
-        },
-      ]);
+      setChatItems((prev) => {
+        const nextItems = [
+          ...prev,
+          {
+            id: `error-${Date.now()}`,
+            type: 'agent_status' as const,
+            statusType: 'agent_done' as const,
+            agent: 'fact_checker',
+            label: `Error: ${error.message || 'Failed to complete research request.'}`,
+          },
+        ];
+        ensureSession(nextItems, buildSessionTitle(nextItems));
+        return nextItems;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -171,40 +314,52 @@ export default function Home() {
 
   const handleStreamEvent = (event: any, originalTopic: string) => {
     if (event.type === 'agent_start' || event.type === 'agent_done' || event.type === 'handoff') {
-      setChatItems((prev) => [
-        ...prev,
-        {
-          id: `status-${Date.now()}-${Math.random()}`,
-          type: 'agent_status',
-          statusType: event.type,
-          agent: event.agent,
-          label: event.label,
-          from: event.from,
-          to: event.to,
-        },
-      ]);
+      setChatItems((prev) => {
+        const nextItems = [
+          ...prev,
+          {
+            id: `status-${Date.now()}-${Math.random()}`,
+            type: 'agent_status' as const,
+            statusType: event.type,
+            agent: event.agent,
+            label: event.label,
+            from: event.from,
+            to: event.to,
+          },
+        ];
+        ensureSession(nextItems, buildSessionTitle(nextItems));
+        return nextItems;
+      });
     } else if (event.type === 'final_report') {
-      setChatItems((prev) => [
-        ...prev,
-        {
-          id: `report-${Date.now()}`,
-          type: 'final_report',
-          reportMarkdown: event.reportMarkdown,
-          sources: event.sources,
-          userTopic: originalTopic || 'M.A.R.S Research',
-        },
-      ]);
+      setChatItems((prev) => {
+        const nextItems = [
+          ...prev,
+          {
+            id: `report-${Date.now()}`,
+            type: 'final_report' as const,
+            reportMarkdown: event.reportMarkdown,
+            sources: event.sources,
+            userTopic: originalTopic || 'M.A.R.S Research',
+          },
+        ];
+        ensureSession(nextItems, buildSessionTitle(nextItems));
+        return nextItems;
+      });
     } else if (event.type === 'error') {
-      setChatItems((prev) => [
-        ...prev,
-        {
-          id: `error-${Date.now()}`,
-          type: 'agent_status',
-          statusType: 'agent_done',
-          agent: 'editor',
-          label: `Error: ${event.error}`,
-        },
-      ]);
+      setChatItems((prev) => {
+        const nextItems = [
+          ...prev,
+          {
+            id: `error-${Date.now()}`,
+            type: 'agent_status' as const,
+            statusType: 'agent_done' as const,
+            agent: 'editor',
+            label: `Error: ${event.error}`,
+          },
+        ];
+        ensureSession(nextItems, buildSessionTitle(nextItems));
+        return nextItems;
+      });
     }
   };
 
@@ -219,15 +374,44 @@ export default function Home() {
 
   const renderContent = () => {
     if (activeView === 'library') {
-      return <LibraryPanel onOpenResearch={() => setActiveView('research')} />;
+      return (
+        <LibraryPanel
+          sessions={sessions}
+          onOpenResearch={() => setActiveView('research')}
+          onOpenSession={openSession}
+          onStartNewChat={startNewChat}
+        />
+      );
     }
 
     if (activeView === 'settings') {
-      return <SettingsPanel />;
+      return (
+        <SettingsPanel
+          user={user}
+          preferences={preferences}
+          onPreferencesChange={setPreferences}
+          onSignOut={handleLogout}
+        />
+      );
     }
 
     return (
       <>
+        <div className="flex flex-col gap-3 rounded-[24px] border border-surface-border bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-outline">Active workspace</p>
+            <h3 className="mt-1 text-lg font-semibold text-primary">{sessions.find((session) => session.id === activeSessionId)?.title || 'New research brief'}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={startNewChat}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-surface-border bg-surface-container-low px-4 py-2 text-sm font-semibold text-primary transition hover:border-primary"
+          >
+            <span className="material-symbols-outlined text-[18px]">add_circle</span>
+            New chat
+          </button>
+        </div>
+
         {chatItems.length === 0 ? (
           <section className="overflow-hidden rounded-[28px] border border-surface-border bg-white/95 p-5 shadow-sm sm:p-7">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
