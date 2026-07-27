@@ -5,6 +5,8 @@ import { ChatHeader } from '@/components/ChatHeader';
 import { AgentStatusRow } from '@/components/AgentStatusRow';
 import { FinalReportBubble } from '@/components/FinalReportBubble';
 import { MessageInputBar } from '@/components/MessageInputBar';
+import { LibraryPanel } from '@/components/LibraryPanel';
+import { SettingsPanel } from '@/components/SettingsPanel';
 
 interface ChatItem {
   id: string;
@@ -30,6 +32,7 @@ const QUICK_PROMPTS = [
 export default function Home() {
   const [chatItems, setChatItems] = useState<ChatItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeView, setActiveView] = useState<'research' | 'library' | 'settings'>('research');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -166,11 +169,17 @@ export default function Home() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background font-chat-bubble text-on-surface">
-      <ChatHeader />
+  const renderContent = () => {
+    if (activeView === 'library') {
+      return <LibraryPanel onOpenResearch={() => setActiveView('research')} />;
+    }
 
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-40 pt-24 md:px-8 md:pb-36">
+    if (activeView === 'settings') {
+      return <SettingsPanel />;
+    }
+
+    return (
+      <>
         {chatItems.length === 0 ? (
           <section className="overflow-hidden rounded-[28px] border border-surface-border bg-white/95 p-5 shadow-sm sm:p-7">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -266,23 +275,54 @@ export default function Home() {
         )}
 
         <div ref={bottomRef} />
+      </>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-background font-chat-bubble text-on-surface">
+      <ChatHeader />
+
+      <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-40 pt-24 md:px-8 md:pb-36">
+        <div className="hidden items-center justify-end gap-2 rounded-full border border-surface-border bg-white/90 p-1 shadow-sm md:flex">
+          {[
+            { id: 'research', label: 'Research', icon: 'chat_bubble' },
+            { id: 'library', label: 'Library', icon: 'history_edu' },
+            { id: 'settings', label: 'Settings', icon: 'settings' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveView(tab.id as 'research' | 'library' | 'settings')}
+              className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition ${activeView === tab.id ? 'bg-primary text-white' : 'text-outline hover:text-primary'}`}
+            >
+              <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {renderContent()}
       </main>
 
-      <MessageInputBar onSend={handleSend} isLoading={isLoading} />
+      {activeView === 'research' && <MessageInputBar onSend={handleSend} isLoading={isLoading} />}
 
       <nav className="fixed bottom-0 left-0 z-[60] flex h-16 w-full items-center justify-around border-t border-surface-border bg-surface px-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] md:hidden">
-        <a className="flex flex-col items-center justify-center text-primary" href="#">
-          <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
-          <span className="mt-1 text-[10px] font-semibold">Research</span>
-        </a>
-        <a className="flex flex-col items-center justify-center text-outline" href="#">
-          <span className="material-symbols-outlined text-[20px]">history_edu</span>
-          <span className="mt-1 text-[10px] font-semibold">Library</span>
-        </a>
-        <a className="flex flex-col items-center justify-center text-outline" href="#">
-          <span className="material-symbols-outlined text-[20px]">settings</span>
-          <span className="mt-1 text-[10px] font-semibold">Settings</span>
-        </a>
+        {[
+          { id: 'research', label: 'Research', icon: 'chat_bubble' },
+          { id: 'library', label: 'Library', icon: 'history_edu' },
+          { id: 'settings', label: 'Settings', icon: 'settings' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveView(tab.id as 'research' | 'library' | 'settings')}
+            className={`flex flex-col items-center justify-center ${activeView === tab.id ? 'text-primary' : 'text-outline'}`}
+          >
+            <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>
+            <span className="mt-1 text-[10px] font-semibold">{tab.label}</span>
+          </button>
+        ))}
       </nav>
     </div>
   );
