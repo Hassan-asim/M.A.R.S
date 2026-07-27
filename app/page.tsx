@@ -33,6 +33,7 @@ export default function Home() {
   const [chatItems, setChatItems] = useState<ChatItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeView, setActiveView] = useState<'research' | 'library' | 'settings'>('research');
+  const [isHydrated, setIsHydrated] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -42,6 +43,37 @@ export default function Home() {
   useEffect(() => {
     scrollToBottom();
   }, [chatItems]);
+
+  useEffect(() => {
+    try {
+      const savedItems = window.localStorage.getItem('mars-chat-items');
+      if (savedItems) {
+        const parsedItems = JSON.parse(savedItems) as ChatItem[];
+        if (Array.isArray(parsedItems)) {
+          setChatItems(parsedItems);
+        }
+      }
+
+      const savedView = window.localStorage.getItem('mars-active-view');
+      if (savedView === 'library' || savedView === 'settings') {
+        setActiveView(savedView);
+      }
+    } catch (error) {
+      console.warn('Unable to restore local app state:', error);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    window.localStorage.setItem('mars-chat-items', JSON.stringify(chatItems));
+  }, [chatItems, isHydrated]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    window.localStorage.setItem('mars-active-view', activeView);
+  }, [activeView, isHydrated]);
 
   const handleSend = async (topic: string, file: File | null) => {
     if (!topic.trim() && !file) return;

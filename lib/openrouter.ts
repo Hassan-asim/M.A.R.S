@@ -3,123 +3,117 @@ export interface Message {
   content: string;
 }
 
-const FREE_MODELS = [
-  'deepseek/deepseek-chat:free',
-  'deepseek/deepseek-r1:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'qwen/qwen-2.5-coder-32b-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
-];
-
-/**
- * Retrieves the pool of available OpenRouter API keys from environment variables.
- */
 function getApiKeyPool(): string[] {
   const keys: string[] = [];
-  const key1 = process.env.OPENROUTER_API_KEY_1;
-  const key2 = process.env.OPENROUTER_API_KEY_2;
-  const key3 = process.env.OPENROUTER_API_KEY_3;
-  const key4 = process.env.OPENROUTER_API_KEY_4;
-  const keyDefault = process.env.OPENROUTER_API_KEY;
+  const deepseek1 = process.env.DEEPSEEK_API_KEY_1;
+  const deepseek2 = process.env.DEEPSEEK_API_KEY_2;
+  const glmKey = process.env.GLM_API_KEY;
 
-  if (key1) keys.push(key1);
-  if (key2) keys.push(key2);
-  if (key3) keys.push(key3);
-  if (key4) keys.push(key4);
-  if (keyDefault && !keys.includes(keyDefault)) keys.push(keyDefault);
+  if (deepseek1) keys.push(deepseek1);
+  if (deepseek2) keys.push(deepseek2);
+  if (glmKey) keys.push(glmKey);
 
   return keys;
 }
 
+async function tryProviderCall(
+  endpoint: string,
+  model: string,
+  apiKey: string,
+  messages: Message[],
+  temperature: number,
+  provider: 'deepseek' | 'glm'
+): Promise<string | null> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (provider === 'deepseek') {
+    headers.Authorization = `Bearer ${apiKey}`;
+  } else {
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model,
+      messages,
+      temperature,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.warn(`${provider} request failed (${response.status}): ${errorText}`);
+    return null;
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (typeof content === 'string' && content.trim()) {
+    return content.trim();
+  }
+
+  return null;
+}
+
 /**
- * Calls OpenRouter using free models with preferred API key distribution and automatic key failover.
- *
- * @param messages Array of chat messages
- * @param preferredKeyIndex Optional 1-based index (1-4) for assigning specific keys to specific agents
- * @param temperature Model sampling temperature
+ * Calls the configured provider pool using DeepSeek and GLM APIs.
  */
 export async function callOpenRouter(
   messages: Message[],
   preferredKeyIndex?: number,
   temperature = 0.7
 ): Promise<string> {
-  const keyPool = getApiKeyPool();
+  const apiKeys = getApiKeyPool();
 
-  if (keyPool.length === 0) {
-    throw new Error(
-      'No OpenRouter API key found in environment variables (OPENROUTER_API_KEY_1..4 or OPENROUTER_API_KEY).'
-    );
+  if (apiKeys.length === 0) {
+    throw new Error('No provider API keys were configured.');
   }
 
-  // Order keys so preferred key comes first, followed by remaining keys as fallbacks
-  let orderedKeys: string[] = [];
-
+  const orderedKeys = [...apiKeys];
   if (preferredKeyIndex && preferredKeyIndex >= 1 && preferredKeyIndex <= 4) {
-    const preferredKey = process.env[`OPENROUTER_API_KEY_${preferredKeyIndex}`];
-    if (preferredKey) {
-      orderedKeys.push(preferredKey);
+    const preferred = apiKeys[preferredKeyIndex - 1];
+    if (preferred) {
+      orderedKeys.splice(orderedKeys.indexOf(preferred), 1);
+      orderedKeys.unshift(preferred);
     }
   }
 
-  // Add any remaining keys from pool
-  for (const k of keyPool) {
-    if (!orderedKeys.includes(k)) {
-      orderedKeys.push(k);
-    }
-  }
+  const providers = [
+    { provider: 'deepseek' as const, endpoint: 'https://api.deepseek.com/chat/completions', model: 'deepseek-chat' },
+    { provider: 'glm' as const, endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions', model: 'glm-4-flash' },
+  ];
 
-  let lastError: any = null;
+  let lastError: unknown = null;
 
-  for (const model of FREE_MODELS) {
-    // CRITICAL REQUIREMENT: Model ID must end with :free to avoid paid charges
-    if (!model.endsWith(':free')) {
-      continue;
-    }
-
+  for (const providerConfig of providers) {
     for (const apiKey of orderedKeys) {
       try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://mars-research.vercel.app',
-            'X-Title': process.env.OPENROUTER_SITE_NAME || 'M.A.R.S',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model,
-            messages,
-            temperature,
-          }),
-        });
+        const result = await tryProviderCall(
+          providerConfig.endpoint,
+          providerConfig.model,
+          apiKey,
+          messages,
+          temperature,
+          providerConfig.provider
+        );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.warn(
-            `OpenRouter model ${model} with key ending ...${apiKey.slice(-6)} failed (${response.status}): ${errorText}`
-          );
-          lastError = new Error(`OpenRouter API error ${response.status}: ${errorText}`);
-          // Try next API key in pool
-          continue;
-        }
-
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content;
-        if (content && typeof content === 'string') {
-          return content.trim();
+        if (result) {
+          return result;
         }
       } catch (err) {
-        console.warn(`Fetch error for OpenRouter model ${model}:`, err);
         lastError = err;
+        console.warn(`${providerConfig.provider} fetch error:`, err);
       }
     }
   }
 
   if (lastError) {
-    console.warn('OpenRouter fallback exhausted, returning a deterministic local response.');
+    console.warn('Provider fallback exhausted, returning a local response.');
   }
 
-  const fallbackText = `This is a fallback response generated locally because the configured OpenRouter free models were unavailable. The research workflow is still active, and the app can continue to produce a structured report with the available pipeline context.`;
-
-  return fallbackText;
+  return 'This is a locally generated fallback response because the configured provider endpoints were not available at the moment.';
 }
