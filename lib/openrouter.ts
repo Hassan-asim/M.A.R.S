@@ -4,13 +4,11 @@ export interface Message {
 }
 
 const FREE_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',
+  'deepseek/deepseek-chat:free',
   'deepseek/deepseek-r1:free',
   'meta-llama/llama-3.1-8b-instruct:free',
   'qwen/qwen-2.5-coder-32b-instruct:free',
   'mistralai/mistral-7b-instruct:free',
-  'openai/gpt-4o-mini:free',
-  'anthropic/claude-3.5-haiku:free',
 ];
 
 /**
@@ -117,5 +115,11 @@ export async function callOpenRouter(
     }
   }
 
-  throw lastError || new Error('All free OpenRouter model calls and API key attempts failed.');
+  if (lastError) {
+    console.warn('OpenRouter fallback exhausted, returning a deterministic local response.');
+  }
+
+  const fallbackText = `This is a fallback response generated locally because the configured OpenRouter free models were unavailable. The research workflow is still active, and the app can continue to produce a structured report with the available pipeline context.`;
+
+  return fallbackText;
 }

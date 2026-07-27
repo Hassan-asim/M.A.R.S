@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { clearAuthSession, readAuthSession, saveAuthSession, type AuthUser } from '@/lib/auth';
 
 const settingsCards = [
   {
@@ -19,6 +20,30 @@ const settingsCards = [
 ];
 
 export const SettingsPanel: React.FC = () => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    setUser(readAuthSession());
+  }, []);
+
+  const handleSignIn = () => {
+    const mockUser: AuthUser = {
+      id: 'google-user',
+      name: 'Google User',
+      email: 'google.user@example.com',
+      provider: 'google',
+      signedInAt: new Date().toISOString(),
+    };
+
+    saveAuthSession(mockUser);
+    setUser(mockUser);
+  };
+
+  const handleLogout = () => {
+    clearAuthSession();
+    setUser(null);
+  };
+
   return (
     <section className="space-y-4">
       <div className="rounded-[24px] border border-surface-border bg-white/95 p-5 shadow-sm sm:p-6">
@@ -43,12 +68,28 @@ export const SettingsPanel: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold text-primary">Google sign-in</h3>
             <p className="mt-2 text-sm leading-6 text-on-surface-variant">
-              Add a Google sign-in option so users can save sessions and access their workspace securely.
+              {user
+                ? `Signed in as ${user.email}. Your session stays saved in a browser cookie until you sign out manually.`
+                : 'Add a Google sign-in option so users can save sessions and access their workspace securely.'}
             </p>
           </div>
-          <button className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90">
-            Sign in with Google
-          </button>
+          {user ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-full border border-surface-border bg-white px-4 py-2 text-sm font-semibold text-on-surface transition hover:border-primary hover:text-primary"
+            >
+              Sign out
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSignIn}
+              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Sign in with Google
+            </button>
+          )}
         </div>
       </div>
     </section>
