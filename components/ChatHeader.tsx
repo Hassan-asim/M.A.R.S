@@ -9,16 +9,7 @@ export const ChatHeader: React.FC = () => {
   }, []);
 
   const handleGoogleSignIn = () => {
-    const mockUser: AuthUser = {
-      id: 'google-user',
-      name: 'Google User',
-      email: 'google.user@example.com',
-      provider: 'google',
-      signedInAt: new Date().toISOString(),
-    };
-
-    saveAuthSession(mockUser);
-    setUser(mockUser);
+    window.location.assign('/api/auth/google/start');
   };
 
   const handleLogout = () => {
