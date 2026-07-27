@@ -20,11 +20,11 @@ function getProviderPool(): ProviderConfig[] {
   const geminiKey = process.env.GEMINI_API_KEY;
 
   if (deepseek1) {
-    providers.push({ provider: 'deepseek', endpoint: 'https://api.deepseek.com/chat/completions', model: 'deepseek-chat', apiKey: deepseek1 });
+    providers.push({ provider: 'deepseek', endpoint: 'https://mars-123-resource.services.ai.azure.com/openai/v1/chat/completions', model: 'deepseek-chat', apiKey: deepseek1 });
   }
 
   if (deepseek2) {
-    providers.push({ provider: 'deepseek', endpoint: 'https://api.deepseek.com/chat/completions', model: 'deepseek-chat', apiKey: deepseek2 });
+    providers.push({ provider: 'deepseek', endpoint: 'https://mars-123-resource.services.ai.azure.com/openai/v1/chat/completions', model: 'deepseek-chat', apiKey: deepseek2 });
   }
 
   if (glmKey) {
@@ -32,7 +32,7 @@ function getProviderPool(): ProviderConfig[] {
   }
 
   if (groqKey) {
-    providers.push({ provider: 'groq', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.1-8b-instant', apiKey: groqKey });
+    providers.push({ provider: 'groq', endpoint: 'https://mars-123-resource.services.ai.azure.com/openai/v1/chat/completions', model: 'llama-3.1-8b-instant', apiKey: groqKey });
   }
 
   if (geminiKey) {
