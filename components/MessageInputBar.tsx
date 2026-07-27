@@ -55,22 +55,19 @@ export const MessageInputBar: React.FC<MessageInputBarProps> = ({
   };
 
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-xl px-4 md:px-8 py-4 pb-6 md:pb-4 border-t border-surface-border z-50">
-      <div className="max-w-report-max-width mx-auto flex flex-col gap-2">
-        {/* Contextual File Chip */}
+    <footer className="fixed bottom-16 left-0 z-50 w-full border-t border-surface-border bg-surface/90 px-4 py-4 pb-6 backdrop-blur-xl md:bottom-0 md:pb-4">
+      <div className="mx-auto flex max-w-report-max-width flex-col gap-2">
         {attachedFile && (
           <div className="flex items-center gap-2 animate-fade-in">
-            <div className="flex items-center gap-2 bg-white border border-surface-border px-3 py-1.5 rounded-full shadow-sm">
-              <span className="material-symbols-outlined text-agent-researcher-a text-[18px]">
-                description
-              </span>
-              <span className="text-xs font-medium text-on-surface truncate max-w-[180px]">
+            <div className="flex items-center gap-2 rounded-full border border-surface-border bg-white px-3 py-1.5 shadow-sm">
+              <span className="material-symbols-outlined text-[18px] text-agent-researcher-a">description</span>
+              <span className="max-w-[180px] truncate text-xs font-medium text-on-surface">
                 {attachedFile.name}
               </span>
               <button
                 type="button"
                 onClick={removeFile}
-                className="material-symbols-outlined text-outline-variant hover:text-error text-[16px] transition-colors"
+                className="material-symbols-outlined text-[16px] text-outline-variant transition-colors hover:text-error"
                 title="Remove file"
               >
                 close
@@ -79,8 +76,7 @@ export const MessageInputBar: React.FC<MessageInputBarProps> = ({
           </div>
         )}
 
-        {/* Input Bar */}
-        <div className="relative flex items-center bg-white border border-surface-border rounded-xl shadow-md overflow-hidden focus-within:border-primary transition-colors">
+        <div className="relative flex items-center overflow-hidden rounded-2xl border border-surface-border bg-white shadow-sm transition-colors focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(0,51,66,0.08)]">
           <input
             type="file"
             ref={fileInputRef}
@@ -92,7 +88,7 @@ export const MessageInputBar: React.FC<MessageInputBarProps> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="p-3 text-outline hover:text-primary transition-colors"
+            className="p-3 text-outline transition-colors hover:text-primary"
             title="Attach document (.pdf, .docx, .md, .txt)"
             disabled={isLoading}
           >
@@ -106,16 +102,16 @@ export const MessageInputBar: React.FC<MessageInputBarProps> = ({
             onInput={handleTextareaInput}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            placeholder="Enter a research topic, or describe what you want expanded..."
+            placeholder="Ask M.A.R.S a follow-up or provide more data..."
             rows={1}
-            className="w-full py-3 bg-transparent border-none focus:ring-0 text-sm text-on-surface resize-none max-h-32 focus:outline-none"
+            className="max-h-32 w-full resize-none border-none bg-transparent py-3 text-sm text-on-surface focus:outline-none focus:ring-0"
           />
 
           <button
             type="button"
             onClick={handleSubmit}
             disabled={(!topic.trim() && !attachedFile) || isLoading}
-            className="p-3 mr-1 text-primary hover:bg-surface-container-low rounded-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="mr-1 rounded-lg p-3 text-primary transition-all hover:bg-surface-container-low active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
             title="Send to M.A.R.S Agents"
           >
             <span className="material-symbols-outlined font-bold">

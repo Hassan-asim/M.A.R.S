@@ -80,22 +80,14 @@ export const AgentStatusRow: React.FC<AgentStatusRowProps> = ({
     const toAgent = AGENT_MAP[to] || { name: to, textClass: 'text-primary' };
 
     return (
-      <div className="flex items-center gap-3 my-1">
-        <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center">
-          <span className="material-symbols-outlined text-outline-variant text-[18px]">
-            sync_alt
-          </span>
+      <div className="ml-2 flex items-center gap-3 rounded-2xl border border-surface-border bg-white px-3 py-2 shadow-sm">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-container">
+          <span className="material-symbols-outlined text-[18px] text-outline-variant">sync_alt</span>
         </div>
-        <div className="flex items-center gap-2 font-status-label text-xs">
-          <span className={`${fromAgent.textClass} font-semibold uppercase`}>
-            {fromAgent.name}
-          </span>
-          <span className="material-symbols-outlined text-outline-variant text-[16px]">
-            arrow_forward
-          </span>
-          <span className={`${toAgent.textClass} font-semibold uppercase`}>
-            {toAgent.name}
-          </span>
+        <div className="flex items-center gap-2 text-xs font-medium">
+          <span className={`${fromAgent.textClass} font-semibold uppercase`}>{fromAgent.name}</span>
+          <span className="material-symbols-outlined text-[16px] text-outline-variant">arrow_forward</span>
+          <span className={`${toAgent.textClass} font-semibold uppercase`}>{toAgent.name}</span>
         </div>
       </div>
     );
@@ -111,22 +103,22 @@ export const AgentStatusRow: React.FC<AgentStatusRowProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-3 my-1">
-      <div className={`w-8 h-8 rounded-full ${agentInfo.bgClass} flex items-center justify-center`}>
+    <div className="ml-2 flex items-center gap-3 rounded-2xl border border-surface-border bg-white px-3 py-2 shadow-sm">
+      <div className={`flex h-8 w-8 items-center justify-center rounded-full ${agentInfo.bgClass}`}>
         <span className={`material-symbols-outlined ${agentInfo.textClass} text-[18px]`}>
           {agentInfo.icon}
         </span>
       </div>
       <div className="flex flex-col">
-        <span className={`font-status-label text-[11px] ${agentInfo.textClass} uppercase font-bold`}>
+        <span className={`font-status-label text-[11px] ${agentInfo.textClass} font-bold uppercase`}>
           {agentInfo.name}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-on-surface-variant font-medium">
+          <span className="text-xs font-medium text-on-surface-variant">
             {label || (type === 'agent_done' ? 'Completed step.' : 'Processing...')}
           </span>
           {type === 'agent_start' && (
-            <div className={`w-1.5 h-1.5 rounded-full ${agentInfo.colorClass} pulse-dot`} />
+            <div className={`h-1.5 w-1.5 rounded-full ${agentInfo.colorClass} pulse-dot`} />
           )}
         </div>
       </div>

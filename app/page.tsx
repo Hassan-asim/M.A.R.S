@@ -9,20 +9,23 @@ import { MessageInputBar } from '@/components/MessageInputBar';
 interface ChatItem {
   id: string;
   type: 'user' | 'agent_status' | 'final_report';
-  // User fields
   userTopic?: string;
   fileName?: string;
   timestamp?: string;
-  // Status fields
   statusType?: 'agent_start' | 'agent_done' | 'handoff';
   agent?: string;
   label?: string;
   from?: string;
   to?: string;
-  // Report fields
   reportMarkdown?: string;
   sources?: string[];
 }
+
+const QUICK_PROMPTS = [
+  'Summarize the latest breakthroughs in quantum computing for medicine.',
+  'Compare the current state of AI-assisted drug discovery and clinical trials.',
+  'Expand this research note with recent academic findings and practical implications.',
+];
 
 export default function Home() {
   const [chatItems, setChatItems] = useState<ChatItem[]>([]);
@@ -38,6 +41,8 @@ export default function Home() {
   }, [chatItems]);
 
   const handleSend = async (topic: string, file: File | null) => {
+    if (!topic.trim() && !file) return;
+
     setIsLoading(true);
 
     const userMessageId = `user-${Date.now()}`;
@@ -46,18 +51,15 @@ export default function Home() {
       minute: '2-digit',
     });
 
-    const newItems: ChatItem[] = [
-      ...chatItems,
-      {
-        id: userMessageId,
-        type: 'user',
-        userTopic: topic || (file ? `Attached Document: ${file.name}` : ''),
-        fileName: file?.name,
-        timestamp,
-      },
-    ];
+    const userMessage: ChatItem = {
+      id: userMessageId,
+      type: 'user',
+      userTopic: topic || (file ? `Attached Document: ${file.name}` : ''),
+      fileName: file?.name,
+      timestamp,
+    };
 
-    setChatItems(newItems);
+    setChatItems((prev) => [...prev, userMessage]);
 
     const formData = new FormData();
     if (topic) formData.append('topic', topic);
@@ -83,7 +85,7 @@ export default function Home() {
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ''; // Keep partial line in buffer
+        buffer = lines.pop() || '';
 
         for (const line of lines) {
           const trimmed = line.trim();
@@ -99,7 +101,6 @@ export default function Home() {
         }
       }
 
-      // Flush any remaining buffer line
       if (buffer.trim().startsWith('data: ')) {
         const rawJson = buffer.trim().replace(/^data:\s*/, '');
         try {
@@ -166,90 +167,123 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-chat-bubble text-on-surface">
+    <div className="min-h-screen bg-background font-chat-bubble text-on-surface">
       <ChatHeader />
 
-      <main className="pt-20 pb-36 px-4 md:px-8 max-w-report-max-width mx-auto w-full flex flex-col gap-6">
+      <main className="pt-20 pb-40 md:pb-36 px-4 md:px-8 max-w-report-max-width mx-auto w-full flex flex-col gap-6">
         {chatItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center my-16 text-center text-on-surface-variant gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl">
-              🛰️
-            </div>
-            <h2 className="font-report-h1 text-2xl font-bold text-primary">
-              Welcome to M.A.R.S
-            </h2>
-            <p className="text-sm max-w-md">
-              Multi-Agent Research System. Enter a topic or upload notes/documents (.pdf, .docx, .md, .txt) to activate the 6-agent collaborative team.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-xs font-mono">
-              <span className="bg-white border border-surface-border px-3 py-2 rounded-lg text-agent-planner">
-                1. Planner
-              </span>
-              <span className="bg-white border border-surface-border px-3 py-2 rounded-lg text-agent-researcher-a">
-                2. Researcher A
-              </span>
-              <span className="bg-white border border-surface-border px-3 py-2 rounded-lg text-agent-researcher-b">
-                3. Researcher B
-              </span>
-              <span className="bg-white border border-surface-border px-3 py-2 rounded-lg text-agent-fact-checker">
-                4. Fact-Checker
-              </span>
-              <span className="bg-white border border-surface-border px-3 py-2 rounded-lg text-agent-writer">
-                5. Writer
-              </span>
-              <span className="bg-white border border-surface-border px-3 py-2 rounded-lg text-agent-editor">
-                6. Editor
-              </span>
-            </div>
-          </div>
-        ) : (
-          chatItems.map((item) => {
-            if (item.type === 'user') {
-              return (
-                <div key={item.id} className="flex flex-col items-end w-full animate-fade-in">
-                  <div className="bg-primary text-white p-4 rounded-xl rounded-tr-none max-w-[85%] shadow-sm">
-                    <p className="text-sm leading-relaxed">{item.userTopic}</p>
-                    {item.fileName && (
-                      <div className="mt-2 flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-md text-xs">
-                        <span className="material-symbols-outlined text-[16px]">
-                          description
-                        </span>
-                        <span className="truncate">{item.fileName}</span>
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-[11px] text-outline mt-1 mr-1">{item.timestamp}</span>
+          <section className="mt-4 overflow-hidden rounded-[28px] border border-surface-border bg-white/95 p-5 shadow-sm sm:p-7">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div className="max-w-2xl">
+                <div className="mb-3 inline-flex items-center rounded-full border border-surface-border bg-surface-container-low px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+                  <span className="material-symbols-outlined mr-2 text-[14px]">auto_awesome</span>
+                  Research Studio
                 </div>
-              );
-            } else if (item.type === 'agent_status') {
-              return (
-                <AgentStatusRow
-                  key={item.id}
-                  type={item.statusType || 'agent_start'}
-                  agent={item.agent}
-                  label={item.label}
-                  from={item.from}
-                  to={item.to}
-                />
-              );
-            } else if (item.type === 'final_report') {
-              return (
-                <FinalReportBubble
-                  key={item.id}
-                  reportMarkdown={item.reportMarkdown || ''}
-                  sources={item.sources || []}
-                  topicTitle={item.userTopic || 'M.A.R.S Report'}
-                />
-              );
-            }
-            return null;
-          })
+                <h2 className="font-report-h1 text-2xl leading-tight text-primary md:text-3xl">
+                  Build a polished research brief with a team of AI agents.
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-on-surface-variant">
+                  Start with a topic, upload notes, and let the Planner, Researchers, Fact-Checker, Writer, and Editor collaborate on a structured report in real time.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-surface-border bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
+                <p className="font-semibold text-primary">Live workflow</p>
+                <ul className="mt-2 space-y-2 text-xs">
+                  <li>• Planner breaks down the question</li>
+                  <li>• Researchers gather evidence</li>
+                  <li>• Editor approves the final report</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-surface-border bg-surface-container-low p-4 sm:p-5">
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
+                <span className="material-symbols-outlined text-[16px] text-primary">rocket_launch</span>
+                Suggested starters
+              </div>
+              <div className="grid gap-2 md:grid-cols-3">
+                {QUICK_PROMPTS.map((prompt, index) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => handleSend(prompt, null)}
+                    className="animate-fade-in rounded-2xl border border-surface-border bg-white px-3 py-3 text-left text-sm text-on-surface transition hover:-translate-y-0.5 hover:border-primary hover:bg-surface-container-low"
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {chatItems.map((item) => {
+              if (item.type === 'user') {
+                return (
+                  <div key={item.id} className="flex flex-col items-end w-full animate-fade-in">
+                    <div className="max-w-[88%] rounded-2xl rounded-tr-none border border-surface-border bg-primary px-4 py-3 text-white shadow-sm">
+                      <p className="text-sm leading-6">{item.userTopic}</p>
+                      {item.fileName && (
+                        <div className="mt-2 flex items-center gap-2 rounded-full bg-white/10 px-2.5 py-1 text-xs">
+                          <span className="material-symbols-outlined text-[16px]">description</span>
+                          <span className="truncate">{item.fileName}</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="mr-1 mt-1 text-[11px] text-outline">{item.timestamp}</span>
+                  </div>
+                );
+              }
+
+              if (item.type === 'agent_status') {
+                return (
+                  <AgentStatusRow
+                    key={item.id}
+                    type={item.statusType || 'agent_start'}
+                    agent={item.agent}
+                    label={item.label}
+                    from={item.from}
+                    to={item.to}
+                  />
+                );
+              }
+
+              if (item.type === 'final_report') {
+                return (
+                  <FinalReportBubble
+                    key={item.id}
+                    reportMarkdown={item.reportMarkdown || ''}
+                    sources={item.sources || []}
+                    topicTitle={item.userTopic || 'M.A.R.S Report'}
+                  />
+                );
+              }
+
+              return null;
+            })}
+          </div>
         )}
 
         <div ref={bottomRef} />
       </main>
 
       <MessageInputBar onSend={handleSend} isLoading={isLoading} />
+
+      <nav className="fixed bottom-0 left-0 z-[60] flex h-16 w-full items-center justify-around border-t border-surface-border bg-surface px-4 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] md:hidden">
+        <a className="flex flex-col items-center justify-center text-primary" href="#">
+          <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
+          <span className="mt-1 text-[10px] font-semibold">Research</span>
+        </a>
+        <a className="flex flex-col items-center justify-center text-outline" href="#">
+          <span className="material-symbols-outlined text-[20px]">history_edu</span>
+          <span className="mt-1 text-[10px] font-semibold">Library</span>
+        </a>
+        <a className="flex flex-col items-center justify-center text-outline" href="#">
+          <span className="material-symbols-outlined text-[20px]">settings</span>
+          <span className="mt-1 text-[10px] font-semibold">Settings</span>
+        </a>
+      </nav>
     </div>
   );
 }
