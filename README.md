@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="./screenshots/06-sign-in-desktop.png" alt="M.A.R.S banner" width="0" height="0" style="display:none" />
-
 # M.A.R.S — Multi-Agent Research System
 
 **Your AI research team — plan, search, verify, write, approve.**
@@ -9,6 +7,7 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-m--a--r--s.vercel.app-0A2540?style=for-the-badge&logo=vercel&logoColor=white)](https://m-a-r-s.vercel.app/)
 [![Built with Next.js](https://img.shields.io/badge/Built%20with-Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Orchestration Mastra](https://img.shields.io/badge/Orchestration-Mastra-6E56CF?style=for-the-badge)](https://mastra.ai/)
+[![Multi Provider AI](https://img.shields.io/badge/AI-Multi--Provider-1D9A6C?style=for-the-badge)](#tech-stack)
 [![License MIT](https://img.shields.io/badge/License-MIT-1D9A6C?style=for-the-badge)](#license)
 
 </div>
@@ -27,6 +26,7 @@
 - [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
+- [Security Notes](#security-notes)
 - [Deployment](#deployment)
 - [Project Structure](#project-structure)
 - [License](#license)
@@ -36,7 +36,7 @@
 
 ## Overview
 
-**M.A.R.S** (Multi-Agent Research System) is a chat-based research report generator built on **Next.js**, orchestrated with **Mastra**, powered by **OpenRouter's free-tier language models**, and grounded in live web data through **Tavily Search**.
+**M.A.R.S** (Multi-Agent Research System) is a chat-based research report generator built on **Next.js**, orchestrated with **Mastra**, powered by a **pool of AI model providers**, and grounded in live web data through **Tavily Search**.
 
 A user enters a research topic, optionally attaches a source document (`.pdf`, `.docx`, `.md`, `.txt`), and a team of six specialized AI agents collaborates in real time to plan, research, fact-check, draft, and approve a fully cited Markdown research report.
 
@@ -44,7 +44,8 @@ A user enters a research topic, optionally attaches a source document (`.pdf`, `
 |---|---|
 | **Status** | Live in production |
 | **Deployment** | Single unified Vercel project (frontend + Edge API) |
-| **Cost model** | 100% free-tier AI models, zero paid inference usage |
+| **Authentication** | Google OAuth |
+| **Model strategy** | Multi-provider pool with automatic failover |
 
 ---
 
@@ -87,8 +88,8 @@ Instead of one model generating an answer in a single pass, M.A.R.S splits the j
 - **Downloadable reports** in Markdown format, with an expandable "View Research Sources" panel listing the citations used.
 - **Research Library** — every past research run is saved with its status (Draft / Completed) and can be reopened in chat.
 - **Workspace settings** — configurable output format (e.g. bullet brief), research depth (e.g. fast scan), and writing tone (e.g. analytical), plus auto-save of research threads.
-- **Four-key OpenRouter pool with rotation** — requests are distributed across four separate API keys with failover to avoid rate-limit interruptions.
-- **Strict free-tier enforcement** — only models with a `:free` suffix are called, so the app runs at zero inference cost.
+- **Multi-provider model pool with failover** — requests are distributed across several AI providers (DeepSeek, GLM, Groq, Gemini) so the pipeline keeps running even if one provider is rate-limited or unavailable.
+- **Google OAuth authentication** — each user's research workspace is private to their signed-in Google account.
 - **Responsive design** — a single codebase serving both the mobile chat experience and the full desktop workspace (Research, Library, Settings).
 
 ---
@@ -115,9 +116,9 @@ The core AI feature is the **six-agent research pipeline**. Each agent has a nar
 
 **Models and services behind the pipeline:**
 
-- Language generation is routed through **OpenRouter**, calling exclusively `:free`-tier models such as `meta-llama/llama-3.3-70b-instruct:free` and `deepseek/deepseek-r1:free`.
-- Live web search is provided by the **Tavily** free tier.
-- Requests are load-balanced across four OpenRouter API keys, with a fallback key configured in case all pooled keys are exhausted.
+- Language generation is routed across a **pool of AI providers** — DeepSeek (dual key rotation), GLM (Zhipu AI), Groq, and Gemini — so the pipeline can fail over to another provider if one is rate-limited or unavailable.
+- Live web search is provided by **Tavily**.
+- Authentication is handled through **Google OAuth**, scoping each research workspace to a signed-in account.
 
 ---
 
@@ -134,12 +135,12 @@ flowchart TD
 
     subgraph PIPE["Six-Agent Research Pipeline"]
         direction TB
-        P["1. Planner Agent<br/>Key 1 — builds sub-questions"]
-        RA["2. Researcher A<br/>Key 2 — Tavily search"]
-        RB["3. Researcher B<br/>Key 3 — Tavily search"]
-        FC["4. Fact-Checker<br/>Key 1 — verifies claims"]
-        W["5. Writer Agent<br/>Key 4 — drafts report"]
-        E["6. Senior Editor<br/>Key 4 — approves report"]
+        P["1. Planner Agent<br/>builds sub-questions"]
+        RA["2. Researcher A<br/>Tavily search"]
+        RB["3. Researcher B<br/>Tavily search"]
+        FC["4. Fact-Checker<br/>verifies claims"]
+        W["5. Writer Agent<br/>drafts report"]
+        E["6. Senior Editor<br/>approves report"]
 
         P --> RA
         P --> RB
@@ -149,9 +150,18 @@ flowchart TD
         W --> E
     end
 
+    PROV[["AI Provider Pool<br/>DeepSeek · GLM · Groq · Gemini<br/>(automatic failover)"]] -.-> P
+    PROV -.-> FC
+    PROV -.-> W
+    PROV -.-> E
+    TAV[("Tavily Search")] -.-> RA
+    TAV -.-> RB
+
     E -->|"SSE status updates"| UI
     E -->|"Final cited Markdown report"| UI
     UI --> U
+
+    AUTH["Google OAuth"] -.->|"authenticates"| U
 ```
 
 ### Agent handoff sequence
@@ -193,12 +203,12 @@ sequenceDiagram
 |---|---|
 | Framework | Next.js (App Router) |
 | Agent orchestration | Mastra |
-| Language models | OpenRouter, free-tier models only (e.g. `meta-llama/llama-3.3-70b-instruct:free`, `deepseek/deepseek-r1:free`) |
-| Web search | Tavily API (free tier) |
+| Language models | Multi-provider pool — DeepSeek (2 keys), GLM (Zhipu AI), Groq, Gemini — with automatic failover |
+| Web search | Tavily API |
 | Document parsing | `pdf-parse`, `mammoth`, and native text handling for `.md` / `.txt` |
 | Streaming | Server-Sent Events (SSE) over a single Next.js API route |
+| Authentication | Google OAuth (Google Cloud client credentials) |
 | Hosting | Vercel (unified frontend + Edge API deployment) |
-| Auth | Google OAuth sign-in |
 
 ---
 
@@ -277,7 +287,8 @@ An earlier design iteration from the project's working prototype (internal coden
 
 - Node.js 18 or later
 - npm
-- API keys for OpenRouter and Tavily (see [Environment Variables](#environment-variables))
+- API keys for DeepSeek, GLM, Groq, Gemini, and Tavily
+- A Google Cloud OAuth client (ID, secret, redirect URI)
 
 ### Installation
 
@@ -289,11 +300,7 @@ npm install
 
 ### Configure environment
 
-```bash
-cp .env.example .env.local
-```
-
-Populate `.env.local` with the values described below, then start the development server:
+Create a `.env.local` file in the project root (see [Environment Variables](#environment-variables) below), then start the development server:
 
 ```bash
 npm run dev
@@ -311,30 +318,44 @@ npm run build
 
 ## Environment Variables
 
+Create `.env.local` in the project root with the following keys. **Never commit this file** — it is already covered by `.gitignore`, and the values below are placeholders only.
+
 ```env
-# OpenRouter API Keys (distributed across the 6 research agents)
-OPENROUTER_API_KEY_1=sk-or-v1-...
-OPENROUTER_API_KEY_2=sk-or-v1-...
-OPENROUTER_API_KEY_3=sk-or-v1-...
-OPENROUTER_API_KEY_4=sk-or-v1-...
+# AI Model Providers (multi-provider pool with failover)
+DEEPSEEK_API_KEY_1=
+DEEPSEEK_API_KEY_2=
+GLM_API_KEY=
+GROQ_API_KEY=
+GEMINI_API_KEY=
 
-# Fallback key, used if a pooled key is unavailable
-OPENROUTER_API_KEY=sk-or-v1-...
+# Google OAuth (authentication)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=https://m-a-r-s.vercel.app/auth/google/callback
 
-# Web search (Tavily free tier)
-TAVILY_API_KEY=tvly-...
-
-# Site information sent in OpenRouter request headers
-OPENROUTER_SITE_URL=https://m-a-r-s.vercel.app
-OPENROUTER_SITE_NAME=M.A.R.S
+# Web Search
+TAVILY_API_KEY=
 ```
 
 | Variable | Purpose |
 |---|---|
-| `OPENROUTER_API_KEY_1`–`4` | Pool of keys rotated across the six agents to avoid rate limiting |
-| `OPENROUTER_API_KEY` | Fallback key if the pool is exhausted |
+| `DEEPSEEK_API_KEY_1` / `DEEPSEEK_API_KEY_2` | Dual-key rotation for DeepSeek model calls |
+| `GLM_API_KEY` | Zhipu AI GLM model access |
+| `GROQ_API_KEY` | Groq inference access |
+| `GEMINI_API_KEY` | Google Gemini model access |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth application credentials |
+| `GOOGLE_REDIRECT_URI` | OAuth callback URL registered in Google Cloud Console |
 | `TAVILY_API_KEY` | Powers live web search for the Researcher agents |
-| `OPENROUTER_SITE_URL` / `OPENROUTER_SITE_NAME` | Identify the app to OpenRouter for routing and analytics |
+
+Add the same variables in **Vercel → Project Settings → Environment Variables** for production.
+
+---
+
+## Security Notes
+
+- `.env.local` and any `client_secret_*.json` files must stay out of version control. Confirm both are listed in `.gitignore` before pushing.
+- Treat every key above as sensitive, including provider keys with generous free tiers — rotate any credential that may have been exposed (e.g. shared in chat, screenshots, or logs).
+- The Google OAuth redirect URI must match exactly what is registered in the Google Cloud Console for the production domain.
 
 ---
 
@@ -352,28 +373,30 @@ M.A.R.S is deployed as a single Vercel project containing both the frontend and 
 ## Project Structure
 
 ```
-mars-research/
-├── app/
-│   ├── api/
-│   │   └── research/        # Streaming SSE route running the agent pipeline
-│   ├── (chat)/               # Research chat UI
-│   ├── library/               # Research Library screen
-│   └── settings/              # Workspace settings screen
-├── agents/
-│   ├── planner.ts
-│   ├── researcher-a.ts
-│   ├── researcher-b.ts
-│   ├── fact-checker.ts
-│   ├── writer.ts
-│   └── senior-editor.ts
-├── lib/
-│   ├── openrouter-pool.ts    # 4-key rotation and failover logic
-│   ├── tavily.ts
-│   └── document-extractor.ts # pdf-parse / mammoth / plain text handling
-├── screenshots/               # Images used in this README
-├── .env.example
+Act ai final/
+├── app/                                    # Next.js App Router pages and API routes
+├── components/                             # Shared UI components
+├── lib/                                    # Provider pool, Tavily client, document extraction utilities
+├── public/                                 # Static assets
+├── screenshots/                            # Images used in this README
+├── stitch_file_driven_frontend_builder/    # Stitch-generated frontend build assets
+├── extracted_stitch/                       # Extracted Stitch design output
+├── scratch/                                # Working / scratch files
+├── .env.local                              # Local environment variables (not committed)
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── postcss.config.js
+├── tailwind.config.js
+├── tsconfig.json
+├── next-env.d.ts
+├── PRD-v3-chat-fileupload.md               # Product requirements document
+├── stitch-chat-ui-prompt.md                # Stitch UI generation prompt
+├── coding-agent-prompt-v2.json             # Coding agent prompt reference
 └── README.md
 ```
+
+> Build output (`.next/`), dependencies (`node_modules/`), and editor/IDE folders (`.vscode/`, `.ideavo/`) are omitted above as they are not part of the tracked source tree.
 
 ---
 
