@@ -49,7 +49,8 @@ export async function GET(req: NextRequest) {
       path: '/',
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
       sameSite: 'lax',
-      httpOnly: true,
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
     });
 
     return redirectResponse;

@@ -7,6 +7,7 @@ import { FinalReportBubble } from '@/components/FinalReportBubble';
 import { MessageInputBar } from '@/components/MessageInputBar';
 import { LibraryPanel } from '@/components/LibraryPanel';
 import { SettingsPanel } from '@/components/SettingsPanel';
+import { clearAuthSession, readAuthSession, type AuthUser } from '@/lib/auth';
 
 interface ChatItem {
   id: string;
@@ -34,6 +35,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeView, setActiveView] = useState<'research' | 'library' | 'settings'>('research');
   const [isHydrated, setIsHydrated] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -45,6 +47,10 @@ export default function Home() {
   }, [chatItems]);
 
   useEffect(() => {
+    const syncAuth = () => {
+      setUser(readAuthSession());
+    };
+
     try {
       const savedItems = window.localStorage.getItem('mars-chat-items');
       if (savedItems) {
@@ -61,6 +67,7 @@ export default function Home() {
     } catch (error) {
       console.warn('Unable to restore local app state:', error);
     } finally {
+      syncAuth();
       setIsHydrated(true);
     }
   }, []);
@@ -201,6 +208,15 @@ export default function Home() {
     }
   };
 
+  const handleSignIn = () => {
+    window.location.assign('/api/auth/google/start');
+  };
+
+  const handleLogout = () => {
+    clearAuthSession();
+    setUser(null);
+  };
+
   const renderContent = () => {
     if (activeView === 'library') {
       return <LibraryPanel onOpenResearch={() => setActiveView('research')} />;
@@ -311,9 +327,37 @@ export default function Home() {
     );
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background font-chat-bubble text-on-surface">
+        <ChatHeader user={user} onSignIn={handleSignIn} onLogout={handleLogout} />
+
+        <main className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center px-4 pb-40 pt-28 md:px-8">
+          <section className="w-full rounded-[28px] border border-surface-border bg-white/95 p-8 text-center shadow-sm sm:p-10">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <span className="material-symbols-outlined text-[28px]">lock</span>
+            </div>
+            <h2 className="mt-5 text-2xl font-semibold text-primary">Sign in to use M.A.R.S</h2>
+            <p className="mt-3 text-sm leading-7 text-on-surface-variant">
+              Your research workspace is private to your signed-in account. Please sign in with Google to continue using the chat, library, and settings experience.
+            </p>
+            <button
+              type="button"
+              onClick={handleSignIn}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              <span className="material-symbols-outlined text-[18px]">account_circle</span>
+              Continue with Google
+            </button>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background font-chat-bubble text-on-surface">
-      <ChatHeader />
+      <ChatHeader user={user} onSignIn={handleSignIn} onLogout={handleLogout} />
 
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-40 pt-24 md:px-8 md:pb-36">
         <div className="hidden items-center justify-end gap-2 rounded-full border border-surface-border bg-white/90 p-1 shadow-sm md:flex">

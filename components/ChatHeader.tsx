@@ -1,21 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { clearAuthSession, getInitials, readAuthSession, saveAuthSession, type AuthUser } from '@/lib/auth';
+import React from 'react';
+import { getInitials, type AuthUser } from '@/lib/auth';
 
-export const ChatHeader: React.FC = () => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+interface ChatHeaderProps {
+  user: AuthUser | null;
+  onSignIn: () => void;
+  onLogout: () => void;
+}
 
-  useEffect(() => {
-    setUser(readAuthSession());
-  }, []);
-
-  const handleGoogleSignIn = () => {
-    window.location.assign('/api/auth/google/start');
-  };
-
-  const handleLogout = () => {
-    clearAuthSession();
-    setUser(null);
-  };
+export const ChatHeader: React.FC<ChatHeaderProps> = ({ user, onSignIn, onLogout }) => {
 
   return (
     <header className="fixed top-0 z-50 flex w-full items-center justify-between border-b border-surface-border bg-surface/85 px-4 py-3 shadow-sm backdrop-blur-md md:px-8">
@@ -47,7 +39,7 @@ export const ChatHeader: React.FC = () => {
             </div>
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={onLogout}
               className="rounded-full p-1.5 text-outline transition hover:bg-surface-container-low"
               title="Sign out"
             >
@@ -57,7 +49,7 @@ export const ChatHeader: React.FC = () => {
         ) : (
           <button
             type="button"
-            onClick={handleGoogleSignIn}
+            onClick={onSignIn}
             className="flex items-center gap-2 rounded-full border border-surface-border bg-white px-3 py-2 text-sm font-medium text-on-surface shadow-sm transition hover:border-primary hover:text-primary"
             title="Sign in with Google"
           >
